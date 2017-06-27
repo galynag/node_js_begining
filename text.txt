@@ -1,0 +1,6 @@
+vasya
+petya
+vovastopstop
+ stop
+stop
+stop"0": "stop"

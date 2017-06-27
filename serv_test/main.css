@@ -1,0 +1,22 @@
+.red {
+    background: red;
+}
+.blue {
+    background: blue;
+}
+.gold {
+    background: gold;
+}
+nav {
+    width: 100%;
+    height: 30px;
+}
+header {
+    width: 80%;
+    margin: 30px auto;
+    height: 100px;
+}
+footer {
+    width: 100%;
+    height: 100px;
+}
