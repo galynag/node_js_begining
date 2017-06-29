@@ -4,7 +4,7 @@ var fs = require("fs");
 
 let counterMain = 0;
 let counterDownload = 0;
-let counterDownloadInd = 0;
+let justData='';
 
 http.createServer(function(request, response){
     let url = request.url;
@@ -15,6 +15,7 @@ http.createServer(function(request, response){
         let hour = now.getHours();
         let minutes = now.getMinutes();
         let seconds = now.getSeconds();
+        justData = now.toString();
         let data = `${hour}:${minutes}:${seconds} ${request.method} ${url}`;
         console.log(data);
         fs.appendFile("app.log", data + "\n");
@@ -37,7 +38,7 @@ http.createServer(function(request, response){
         case '/price.zip':
             ++counterDownload;
             if (counterDownload  == 1) {
-                fs.appendFile("counterDownload.txt", "price.zip / 1 \n")
+                fs.appendFile("counterDownload.txt", `${justData} / price.zip / 1 \n`)
             }
             break;
 
