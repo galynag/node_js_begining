@@ -1,14 +1,32 @@
 var http = require("http");
 var fs = require("fs");
 
+
+let counterMain = 0;
+let counterDownload = 0;
+let counterDownloadInd = 0;
+
 http.createServer(function(request, response){
-    var url = request.url;
-    console.log('url was',url);
-    console.log('url now',url.replace(/\/+/g,''));
+    let url = request.url;
+
+
+    if (url === '/main') {
+        let now = new Date();
+        let hour = now.getHours();
+        let minutes = now.getMinutes();
+        let seconds = now.getSeconds();
+        let data = `${hour}:${minutes}:${seconds} ${request.method} ${url}`;
+        console.log(data);
+        fs.appendFile("app.log", data + "\n");
+    }
 
     switch(url) {
         case '/main':
-            loadPageCombaine('template/header','template/nav','main','template/footer');
+            counterDownload = 0;
+            ++counterMain;
+             loadPageCombaine('template/header','template/nav','main' ,'template/footer', counterMain);
+
+            // addLogLoadingPage();
             break;
         case '/main.css': {
             response.writeHead(200, {'Content-Type': 'text/css'});
@@ -16,12 +34,26 @@ http.createServer(function(request, response){
             break;
 
         }
+        case '/price.zip':
+            ++counterDownload;
+            if (counterDownload  == 1) {
+                fs.appendFile("counterDownload.txt", "price.zip / 1 \n")
+            }
+            break;
 
         default:
             loadPageCombaine('template/header','template/nav','404','template/footer');
             break;
+    };
+    addLogLoadingPage = (request) => {
+        var now = new Date();
+        var hour = now.getHours();
+        var minutes = now.getMinutes();
+        var seconds = now.getSeconds();
+        var data = `${hour}:${minutes}:${seconds} ${request.method} ${request.url} ${request.get("user-agent")}`;
+        console.log(data);
+        fs.appendFile("server.log", data + "\n");
     }
-
     // //функция для загрузки одной страницы
     // function loadPage(filename){
     //     fs.readFile(filename+'.html', function(error, data){
@@ -36,7 +68,7 @@ http.createServer(function(request, response){
     //     });
     // }
 
-    function loadPageCombaine(header,nav,main,footer){
+    function loadPageCombaine(header,nav,main,footer, counter){
         fs.readFile(header+'.html', function(error, data){
             var usersPage;
             if(error){
@@ -52,24 +84,26 @@ http.createServer(function(request, response){
                     }
                     else {
                         usersPage = usersPage + data.toString();
-                        fs.readFile(main + '.html', function (error, data) {
+                        fs.readFile(main + '.html', "utf8", function(error, data){
+
                             if (error) {
                                 response.statusCode = 404;
                                 response.end("Ресурс не найден!");
                             }
                             else {
-                                usersPage = usersPage + data.toString();
-                                fs.readFile(footer + '.html', function (error, data) {
-                                    if (error) {
-                                        response.statusCode = 404;
-                                        response.end("Ресурс не найден!");
-                                    }
-                                    else {
-                                        usersPage = usersPage + data.toString();
-                                        response.end(usersPage);
-                                        return;
-                                    }
-                                });
+                                datamain = data.replace("{counter}", counter);
+                                usersPage = usersPage + datamain.toString();
+                                        fs.readFile(footer + '.html', function (error, data) {
+                                            if (error) {
+                                                response.statusCode = 404;
+                                                response.end("Ресурс не найден!");
+                                            }
+                                            else {
+                                                usersPage = usersPage + data.toString();
+                                                response.end(usersPage);
+                                                return;
+                                            }
+                                        });
                             }
                         });
                     }
